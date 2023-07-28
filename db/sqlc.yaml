@@ -1,0 +1,17 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "./raw_statement"
+    schema: "./migration"
+    gen:
+      go:
+        sql_package: "pgx/v5"
+        out: "./generated"
+        package: "sqlcGen"
+        emit_json_tags: true
+        emit_db_tags: true
+        json_tags_case_style: camel
+        emit_prepared_queries: true
+        overrides:
+          - column: authors.id
+            go_struct_tag: validate:"required"
