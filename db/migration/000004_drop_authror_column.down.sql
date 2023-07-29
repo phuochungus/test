@@ -1,0 +1,9 @@
+BEGIN;
+
+ALTER TABLE authors
+ADD COLUMN bio TEXT;
+
+ALTER TABLE authors
+ADD COLUMN date_of_birth TIMESTAMP;
+
+END;

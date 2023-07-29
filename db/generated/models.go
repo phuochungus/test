@@ -9,8 +9,34 @@ import (
 )
 
 type Author struct {
-	ID          int64            `db:"id" json:"id" validate:"required"`
-	Name        string           `db:"name" json:"name"`
-	Bio         pgtype.Text      `db:"bio" json:"bio"`
-	DateOfBirth pgtype.Timestamp `db:"date_of_birth" json:"dateOfBirth"`
+	ID   int64  `db:"id" json:"id" validate:"required"`
+	Name string `db:"name" json:"name"`
+}
+
+type Book struct {
+	Isbn          string      `db:"isbn" json:"isbn"`
+	Name          pgtype.Text `db:"name" json:"name"`
+	PublisherID   pgtype.Int8 `db:"publisher_id" json:"publisherId"`
+	Quantity      pgtype.Int4 `db:"quantity" json:"quantity"`
+	PublishedYear pgtype.Int2 `db:"published_year" json:"publishedYear"`
+}
+
+type BooksAuthor struct {
+	BookIsbn  string `db:"book_isbn" json:"bookIsbn"`
+	AuthorsID int64  `db:"authors_id" json:"authorsId"`
+}
+
+type BooksGenre struct {
+	GenreID  int64  `db:"genre_id" json:"genreId"`
+	BookIsbn string `db:"book_isbn" json:"bookIsbn"`
+}
+
+type Genre struct {
+	ID   int64       `db:"id" json:"id"`
+	Name pgtype.Text `db:"name" json:"name"`
+}
+
+type Publisher struct {
+	ID   int64       `db:"id" json:"id"`
+	Name pgtype.Text `db:"name" json:"name"`
 }

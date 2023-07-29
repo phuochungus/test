@@ -1,7 +1,6 @@
-CREATE TABLE IF NOT EXISTS
-    authors (
-        id BIGSERIAL PRIMARY KEY,
-        name text NOT NULL,
-        bio text,
-        date_of_birth TIMESTAMP NOT NULL
-    );
+CREATE TABLE authors (
+    id BIGINT PRIMARY KEY,
+    name TEXT NOT NULL,
+    bio TEXT,
+    date_of_birth TIMESTAMP NOT NULL
+);

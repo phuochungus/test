@@ -8,7 +8,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
-	sqlcGen "tutorial.sqlc.dev/app/db/generated"
 )
 
 func connectDB() {
@@ -18,21 +17,14 @@ func connectDB() {
 		os.Exit(1)
 	}
 	defer conn.Close(context.Background())
-
-	q := sqlcGen.New(conn)
-
-	author, err := q.GetAuthor(context.Background(), 1)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "GetAuthor failed: %v\n", err)
-		os.Exit(1)
-	}
-	fmt.Println(author.Name)
 }
 
 func main() {
 	connectDB()
 	r := gin.Default()
 	r.GET("/ping", func(c *gin.Context) {
+		for i := 0; i < 1000000000; i++ {
+		}
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
 		})
