@@ -11,7 +11,7 @@ import (
 )
 
 func connectDB() {
-	conn, err := pgx.Connect(context.Background(), "postgresql://postgres:123123123@localhost:5432/simple_library")
+	conn, err := pgx.Connect(context.Background(), "postgresql://postgres:123123123@localhost:5432/library")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
 		os.Exit(1)
