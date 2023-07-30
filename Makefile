@@ -1,4 +1,4 @@
-DOCKER_RUN = docker run --rm -v "$(CURDIR)/db:/src" -w /src kjconroy/sqlc generate --experimental
+
 DBNAME = library
 
 
@@ -8,8 +8,12 @@ createdb:
 dropdb:
 	dropdb --username=postgres $(DBNAME)
 
+build:
+	go build -o bin/main.exe main.go
+
 run:
-	go run main.go
+	start $(CURDIR)/bin/main.exe
+
 	
 gen:
 	$(DOCKER_RUN)

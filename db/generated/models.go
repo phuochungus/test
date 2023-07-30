@@ -9,8 +9,8 @@ import (
 )
 
 type Author struct {
-	ID   int64  `db:"id" json:"id" validate:"required"`
-	Name string `db:"name" json:"name"`
+	ID   int64  `binding:"-" db:"id" json:"id"`
+	Name string `binding:"required" db:"name" json:"name" validate:"required"`
 }
 
 type Book struct {

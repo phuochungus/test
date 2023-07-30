@@ -12,13 +12,18 @@ import (
 )
 
 const createAuthor = `-- name: CreateAuthor :one
-INSERT INTO authors (name)
-VALUES ($1)
+INSERT INTO authors (id, name)
+VALUES ($1, $2)
 RETURNING id, name
 `
 
-func (q *Queries) CreateAuthor(ctx context.Context, name string) (Author, error) {
-	row := q.db.QueryRow(ctx, createAuthor, name)
+type CreateAuthorParams struct {
+	ID   int64  `binding:"-" db:"id" json:"id"`
+	Name string `binding:"required" db:"name" json:"name" validate:"required"`
+}
+
+func (q *Queries) CreateAuthor(ctx context.Context, arg CreateAuthorParams) (Author, error) {
+	row := q.db.QueryRow(ctx, createAuthor, arg.ID, arg.Name)
 	var i Author
 	err := row.Scan(&i.ID, &i.Name)
 	return i, err
@@ -43,6 +48,20 @@ LIMIT 1
 
 func (q *Queries) GetAuthor(ctx context.Context, id int64) (Author, error) {
 	row := q.db.QueryRow(ctx, getAuthor, id)
+	var i Author
+	err := row.Scan(&i.ID, &i.Name)
+	return i, err
+}
+
+const getAuthorByName = `-- name: GetAuthorByName :one
+SELECT id, name
+FROM authors
+WHERE name = $1
+LIMIT 1
+`
+
+func (q *Queries) GetAuthorByName(ctx context.Context, name string) (Author, error) {
+	row := q.db.QueryRow(ctx, getAuthorByName, name)
 	var i Author
 	err := row.Scan(&i.ID, &i.Name)
 	return i, err
@@ -82,7 +101,7 @@ RETURNING id, name
 `
 
 type UpdateAuthorParams struct {
-	Name pgtype.Text `db:"name" json:"name"`
+	Name pgtype.Text `binding:"required" db:"name" json:"name" validate:"required"`
 	ID   int64       `db:"id" json:"id"`
 }
 
