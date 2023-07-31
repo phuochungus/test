@@ -7,8 +7,6 @@ package sqlcGen
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createAuthor = `-- name: CreateAuthor :one
@@ -79,7 +77,7 @@ func (q *Queries) ListAuthors(ctx context.Context) ([]Author, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Author
+	items := []Author{}
 	for rows.Next() {
 		var i Author
 		if err := rows.Scan(&i.ID, &i.Name); err != nil {
@@ -95,14 +93,14 @@ func (q *Queries) ListAuthors(ctx context.Context) ([]Author, error) {
 
 const updateAuthor = `-- name: UpdateAuthor :one
 UPDATE authors
-SET name = coalesce($1, name)
+SET name = $1::TEXT
 WHERE id = $2::BIGINT
 RETURNING id, name
 `
 
 type UpdateAuthorParams struct {
-	Name pgtype.Text `binding:"required" db:"name" json:"name" validate:"required"`
-	ID   int64       `db:"id" json:"id"`
+	Name string `db:"name" json:"name"`
+	ID   int64  `db:"id" json:"id"`
 }
 
 func (q *Queries) UpdateAuthor(ctx context.Context, arg UpdateAuthorParams) (Author, error) {

@@ -1,23 +1,31 @@
 package authors
 
 import (
-	"context"
 	"errors"
 	"net/http"
 	sqlcGen "root/db/generated"
-	idGen "root/src/id_generator"
 	"root/src/middleware"
-	"root/src/pool"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
+type QueryAuthorDTO struct {
+	ID int64 `uri:"id" binding:"required,gt=0"`
+}
+
+type UpdateAuthorDTO struct {
+	Name string `binding:"required,min=1"`
+}
+
 func CreateController(r *gin.Engine) {
 	c := r.Group("/authors")
 	{
 		c.GET("", findAll)
+		c.GET("/:id", middleware.ValidatePathParam[QueryAuthorDTO](), findOne)
 		c.POST("", middleware.ValidateBody[sqlcGen.CreateAuthorParams](), createOne)
+		c.PATCH("/:id", middleware.ValidatePathParam[QueryAuthorDTO](), middleware.ValidateBody[UpdateAuthorDTO](), updateOne)
+		c.DELETE("/:id", middleware.ValidatePathParam[QueryAuthorDTO](), deleteOne)
 	}
 }
 
@@ -31,20 +39,11 @@ func findAll(ctx *gin.Context) {
 }
 
 func createOne(ctx *gin.Context) {
-	conn, err := pool.GetConnection()
-	defer conn.Release()
-	if err != nil {
-		ctx.AbortWithStatus(500)
-		return
-	}
-	q := sqlcGen.New(conn)
-
-	createAuthor, ok := ctx.Value("body").(sqlcGen.CreateAuthorParams)
+	createAuthorDTO, ok := ctx.Value("body").(sqlcGen.CreateAuthorParams)
 	if !ok {
 		panic("error convert to type sqlcGen.CreateAuthorParams")
 	}
-	createAuthor.ID = int64(idGen.GenId())
-	result, err := q.CreateAuthor(context.Background(), createAuthor)
+	result, err := CreateOne(createAuthorDTO.Name)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
@@ -60,4 +59,55 @@ func createOne(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusCreated, result)
+}
+
+func findOne(ctx *gin.Context) {
+	queryAuthorDTO, ok := ctx.Value("params").(QueryAuthorDTO)
+	if !ok {
+		panic("error convert to type sqlcGen.CreateAuthorParams")
+	}
+	author, err := FindOne(queryAuthorDTO.ID)
+	if err != nil {
+		if err.Error() == "no rows in result set" {
+			ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+				"msg": "author not found",
+			})
+			return
+		}
+		ctx.AbortWithStatusJSON(http.StatusBadGateway, err.Error())
+		return
+	}
+	ctx.JSON(http.StatusOK, author)
+}
+
+func updateOne(ctx *gin.Context) {
+	queryAuthorDTO, ok := ctx.Value("params").(QueryAuthorDTO)
+	if !ok {
+		panic("error convert to type QueryAuthorDTO")
+	}
+	updateAuthorDTO, ok := ctx.Value("body").(UpdateAuthorDTO)
+	if !ok {
+		panic("error convert to type UpdateAuthorParams")
+	}
+
+	author, err := UpdateAuthor(queryAuthorDTO.ID, updateAuthorDTO.Name)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadGateway, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, author)
+}
+
+func deleteOne(ctx *gin.Context) {
+	queryAuthorDTO, ok := ctx.Value("params").(QueryAuthorDTO)
+	if !ok {
+		panic("error convert to type QueryAuthorDTO")
+	}
+	err := DeleteAuthor(queryAuthorDTO.ID)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadGateway, err.Error())
+		return
+	}
+	ctx.AbortWithStatus(http.StatusOK)
 }

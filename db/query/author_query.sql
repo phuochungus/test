@@ -26,6 +26,6 @@ WHERE id = $1;
 
 -- name: UpdateAuthor :one
 UPDATE authors
-SET name = coalesce(sqlc.narg('name'), name)
+SET name = @name::TEXT
 WHERE id = @id::BIGINT
 RETURNING *;

@@ -1,7 +1,7 @@
 version: "2"
 sql:
   - engine: "postgresql"
-    queries: "./raw_statement"
+    queries: "./query"
     schema: "./migration"
     gen:
       go:
@@ -12,6 +12,7 @@ sql:
         emit_db_tags: true
         json_tags_case_style: camel
         emit_prepared_queries: true
+        emit_empty_slices: true
         overrides:
           - column: authors.id
             go_struct_tag: binding:"-"
