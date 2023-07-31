@@ -1,7 +1,7 @@
 version: "2"
 sql:
   - engine: "postgresql"
-    queries: "./raw_statement"
+    queries: "./query"
     schema: "./migration"
     gen:
       go:
