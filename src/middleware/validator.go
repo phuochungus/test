@@ -19,3 +19,15 @@ func ValidateBody[T any]() gin.HandlerFunc {
 		}
 	}
 }
+
+func ValidatePathParam[T any]() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var params T
+		if err := ctx.ShouldBindUri(&params); err != nil {
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+			return
+		}
+		ctx.Set("params", params)
+		ctx.Next()
+	}
+}

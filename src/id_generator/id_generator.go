@@ -13,6 +13,6 @@ func init() {
 	instance = node
 }
 
-func GenId() int {
-	return int(instance.Generate())
+func GenId() int64 {
+	return int64(instance.Generate())
 }
