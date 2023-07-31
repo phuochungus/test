@@ -15,7 +15,7 @@ type QueryAuthorDTO struct {
 }
 
 type UpdateAuthorDTO struct {
-	Name string `binding:"required,min=1"`
+	Name string `binding:"required" json:"name"`
 }
 
 func CreateController(r *gin.Engine) {
@@ -92,10 +92,15 @@ func updateOne(ctx *gin.Context) {
 
 	author, err := UpdateAuthor(queryAuthorDTO.ID, updateAuthorDTO.Name)
 	if err != nil {
+		if err.Error() == "no rows in result set" {
+			ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+				"msg": "author not found",
+			})
+			return
+		}
 		ctx.AbortWithStatusJSON(http.StatusBadGateway, err.Error())
 		return
 	}
-
 	ctx.JSON(http.StatusOK, author)
 }
 

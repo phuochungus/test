@@ -3,6 +3,7 @@ package middleware
 import (
 	"encoding/json"
 	"net/http"
+	"root/src/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -16,21 +17,19 @@ type ErrMsg struct {
 func ValidateBody[T any]() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var body T
-		if err := ctx.BindJSON(&body); err == nil {
+		if err := ctx.ShouldBind(&body); err == nil {
 			ctx.Set("body", body)
 			ctx.Next()
 			return
 		} else {
 			if validationErrs, ok := err.(validator.ValidationErrors); ok {
-				var t []ErrMsg
-				for _, v := range validationErrs {
-					t = append(t, ErrMsg{Tag: v.Tag(), Value: v.Field()})
-				}
-				ctx.JSON(http.StatusBadRequest, gin.H{"msg": "supprite"})
+				msges := utils.ParseErrors(validationErrs)
+				ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+					"messages": msges,
+				})
 				return
 			} else if marshallingErr, ok := err.(*json.UnmarshalTypeError); ok {
-				ctx.JSON(http.StatusBadRequest, marshallingErr.Type.String())
-
+				ctx.AbortWithStatusJSON(http.StatusBadRequest, marshallingErr.Type.String())
 			}
 		}
 	}
