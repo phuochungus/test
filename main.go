@@ -12,6 +12,5 @@ func main() {
 	defer pool.DestroyPool()
 	r := gin.Default()
 	authors.CreateController(r)
-
 	r.Run()
 }
