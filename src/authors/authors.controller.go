@@ -49,7 +49,7 @@ func createOne(ctx *gin.Context) {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
 			if pgErr.Code == "23505" {
-				ctx.JSON(http.StatusBadGateway, gin.H{
+				ctx.JSON(http.StatusConflict, gin.H{
 					"message": "Author already in exist",
 				})
 

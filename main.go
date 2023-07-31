@@ -10,9 +10,7 @@ import (
 func main() {
 	pool.CreatePool()
 	defer pool.DestroyPool()
-
 	r := gin.Default()
-	r.Use(gin.Recovery())
 	authors.CreateController(r)
 
 	r.Run()

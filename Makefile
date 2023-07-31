@@ -1,6 +1,4 @@
-
 DBNAME = library
-
 
 createdb:
 	createdb --username=postgres --owner=postgres $(DBNAME)
@@ -10,13 +8,6 @@ dropdb:
 
 build:
 	go build -o bin/main.exe main.go
-
-run:
-	start $(CURDIR)/bin/main.exe
-
-	
-gen:
-	$(DOCKER_RUN)
 
 mup:
 	migrate -path db/migration -database "postgresql://postgres:123123123@localhost:5432/$(DBNAME)?sslmode=disable" -verbose up
