@@ -6,10 +6,21 @@ import (
 	"root/src/pool"
 	"strings"
 
+	_ "root/docs"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
-	"github.com/go-playground/validator/v10"
+	"github.com/go-playground/validator/v10" // gin-swagger middleware
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
+
+// swagger embed files
+
+// gin-swagger middleware
+
+//	@title		Library Management API
+//	@version	1.0
 
 func main() {
 	pool.CreatePool()
@@ -25,5 +36,7 @@ func main() {
 		})
 	}
 	authors.CreateController(r)
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+
 	r.Run()
 }
