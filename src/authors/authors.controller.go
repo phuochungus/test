@@ -30,7 +30,7 @@ func CreateController(r *gin.Engine) {
 }
 
 func findAll(ctx *gin.Context) {
-	authors, err := FindAll()
+	authors, err := FindAllAuthors()
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadGateway, err)
 	} else {
@@ -43,7 +43,7 @@ func createOne(ctx *gin.Context) {
 	if !ok {
 		panic("error convert to type sqlcGen.CreateAuthorParams")
 	}
-	result, err := CreateOne(createAuthorDTO.Name)
+	result, err := CreateAuthor(createAuthorDTO.Name)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
@@ -66,7 +66,7 @@ func findOne(ctx *gin.Context) {
 	if !ok {
 		panic("error convert to type sqlcGen.CreateAuthorParams")
 	}
-	author, err := FindOne(queryAuthorDTO.ID)
+	author, err := FindAuthorById(queryAuthorDTO.ID)
 	if err != nil {
 		if err.Error() == "no rows in result set" {
 			ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{

@@ -7,7 +7,7 @@ import (
 	"root/src/pool"
 )
 
-func FindAll() (authors []sqlcGen.Author, err error) {
+func FindAllAuthors() (authors []sqlcGen.Author, err error) {
 	conn, err := pool.GetConnection()
 	defer conn.Release()
 	if err != nil {
@@ -18,7 +18,7 @@ func FindAll() (authors []sqlcGen.Author, err error) {
 	return
 }
 
-func FindOne(id int64) (author sqlcGen.Author, err error) {
+func FindAuthorById(id int64) (author sqlcGen.Author, err error) {
 	conn, err := pool.GetConnection()
 	defer conn.Release()
 	if err != nil {
@@ -31,7 +31,7 @@ func FindOne(id int64) (author sqlcGen.Author, err error) {
 	return
 }
 
-func CreateOne(name string) (author sqlcGen.Author, err error) {
+func CreateAuthor(name string) (author sqlcGen.Author, err error) {
 	conn, err := pool.GetConnection()
 	defer conn.Release()
 	if err != nil {
